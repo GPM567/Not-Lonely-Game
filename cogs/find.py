@@ -20,7 +20,7 @@ class Find(commands.Cog):
         requests.reverse()
         pages = math.ceil(len(requests) / 5)
         nowPage = 0
-        if pages == 0:
+        if len(requests) == 0:
             await ctx.send("해당 게임의 모집 글이 없어요! \n`!작성`으로 새로운 글을 올려보세요!")
         embedPages = []
         for i in range(pages):
@@ -39,8 +39,8 @@ class Find(commands.Cog):
                     except AttributeError:
                         statusText = "⚪알 수 없음"
                     embed.add_field(name=f"{tuple(numEmojis.keys())[j]} - {nowReq['title']} - {nowReq['count']}명 모집",
-                                    value=f"작성 유저 - {authorData['nickname']}({statusText})(연령대: {authorData['age']}/성별: {authorData['gender']}"
-                                          f"/보이스채팅(말하기/듣기): {forDB[authorData['canSpeak']]}/{forDB[authorData['canListen']]})"
+                                    value=f"작성 유저 - {authorData['nickname']}({statusText})(연령대: {authorData['age']} / 성별: {authorData['gender']}"
+                                          f" / 보이스채팅(말하기/듣기): {forDB[authorData['canSpeak']]} / {forDB[authorData['canListen']]})"
                                           f"\n{nowReq['content']}", inline=False)
                 except IndexError:
                     continue
@@ -77,7 +77,7 @@ class Find(commands.Cog):
                         await self.bot.get_user(request['authorID']).send(
                             f"{(await db.read('users', f'SELECT nickname FROM UserInfos WHERE discordID is {user.id}'))[0]['nickname']}"
                             f"({self.bot.get_user(user.id).mention} - `{str(self.bot.get_user(user.id))}`)\n"
-                            f"(연령대: {userData['age']}/성별: {userData['gender']}/보이스채팅(말하기/듣기): {forDB[userData['canSpeak']]}/{forDB[userData['canListen']]})"
+                            f"(연령대: {userData['age']} / 성별: {userData['gender']} / 보이스채팅(말하기/듣기): {forDB[userData['canSpeak']]} / {forDB[userData['canListen']]})"
                             f"님이\n{request['title']} 글에 같이 플레이(n인큐) 참가 신청을 보내셨어요!\n"
                             f"DM을 통해 신청자분께 연락해주세요. 같이 플레이(n인큐) 모집 인원이 전부 채워진 경우 `!목록 (게임명)` 명령어로 글을 삭제해주세요."
                         )
@@ -142,6 +142,9 @@ class Find(commands.Cog):
         pages = math.ceil(len(myRequests) / 5)
         nowPage = 0
         embedPages = []
+        if len(myRequests) == 0:
+            await ctx.send("글을 보내지 않으셨어요!")
+            return
         for i in range(pages):
             embed = discord.Embed(title=f"{gameName}의 작성하신 글 검색 결과", description=f"{i + 1} / {pages} 페이지\n"
                                                                                  f"원하시는 번호의 이모지를 눌러 글을 삭제하실 수 있습니다.")
@@ -155,9 +158,6 @@ class Find(commands.Cog):
                                 value="같이 플레이(n인큐) 모집 인원이 모두 채워졌다면 꼭 글을 삭제해주세요!",
                                 inline=False)
             embedPages.append(embed)
-        if not embedPages:
-            await ctx.send("글을 보내지 않으셨어요!")
-            return None
         embedMessage = await ctx.send(embed=embedPages[0])
         if len(myRequests) < 5:
             for emoji in tuple(numEmojis.keys())[:len(myRequests)]:
