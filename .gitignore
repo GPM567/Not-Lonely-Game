@@ -139,3 +139,6 @@ cython_debug/
 
 # Pycharm Files
 .idea/
+
+# DB Files
+data/
