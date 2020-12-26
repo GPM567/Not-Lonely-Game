@@ -142,3 +142,6 @@ cython_debug/
 
 # DB Files
 data/
+
+# Custom Files
+main.py
