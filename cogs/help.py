@@ -15,16 +15,20 @@ class Help(commands.Cog):
         embed.add_field(name="!글작성 (게임명) / !작성 (게임명)", value="해당 게임의 같이 플레이(n인큐) 모집 글을 작성합니다.", inline=False)
         embed.add_field(name="!내글목록 (게임명) / !목록 (게임명)", value="내가 작성한 해당 게임의 모집 글 목록을 보거나 글을 삭제합니다.", inline=False)
         embed.add_field(name="!도움", value="이 도움말을 출력합니다.", inline=False)
+        embed.add_field(name="!게임신청 (게임명) / !게임추가 (게임명)", value="원하시는 게임이 없으실 경우 이 명령어로 게임 추가 요청을 해 주세요!")
         await ctx.send(embed=embed)
 
     @commands.command(name="게임신청", aliases=["게임추가"])
     async def addGame(self, ctx: commands.Context, *, name: str):
-        with open("../data/addGames.json", 'r') as f:
+        with open("data/addGames.json", 'r') as f:
             data = json.load(f)
         if name in data.keys():
             data[name] += 1
         else:
             data[name] = 1
+        with open("data/addGames.json", 'w') as f:
+            json.dump(data, f, indent=2)
+        await ctx.send("성공적으로 처리되었습니다.")
 
 
 def setup(bot: commands.Bot):
